@@ -30,6 +30,8 @@ Including an example of how to use your role (for instance, with variables passe
 Install Molecule 
 -------------------
 pip install molecule molecule-plugins[docker] ansible
+
+
 molecule init scenario default -d docker
 
 

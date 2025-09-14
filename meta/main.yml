@@ -8,6 +8,8 @@ galaxy_info:
   platforms:
     - name: Debian
       versions: [bookworm, bullseye]
+    - name: centos
+      versions: [8, 9]
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value

@@ -2,9 +2,13 @@
 driver:
   name: docker
 platforms:
-  - name: centos
-    image: quay.io/centos/centos:stream8
-    pre_build_image: true
   - name: ubuntu
-    image: ubuntu:22.04
+    image: geerlingguy/docker-ubuntu2204-ansible
     pre_build_image: true
+    privileged: true
+  - name: rocky
+    image: geerlingguy/docker-rockylinux9-ansible
+    pre_build_image: true
+    privileged: true
+dependency:
+  name: galaxy

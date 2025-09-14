@@ -1,8 +1,5 @@
 ---
 # tasks file for ansible-role-mysql
-- name: Gather Facts
-  ansible.builtin.setup:
-  tags: always
 
 - name: Run if OS is Debian or Ubuntu
   ansible.builtin.include_tasks: debianmysql.yml
