@@ -1,0 +1,62 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  tags: ubuntu-mysql
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - wget
+    - gnupg
+    - lsb-release
+    - apt-transport-https
+    - ca-certificates
+    - software-properties-common
+    - curl
+    - dirmngr
+  tags: ubuntu-mysql
+
+- name: Add MySQL GPG Key
+  ansible.builtin.apt_key:
+    url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+    state: present
+  tags: ubuntu-mysql
+
+- name: Import Mysql repository
+  ansible.builtin.apt_repository:
+    repo: "deb http://repo.mysql.com/apt/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] | lower }} mysql-{{ mysql_version }}"
+    state: present
+    filename: mysql.list
+  tags: ubuntu-mysql
+
+- name: Update apt cache after adding MySQL repo
+  ansible.builtin.apt:
+    update_cache: yes
+  tags: ubuntu-mysql
+
+- name: Set Mysql root password before installation
+  ansible.builtin.debconf:
+    name: mysql-server
+    question: mysql-server/root_password
+    value: "{{ mysql_root_password }}"
+    vtype: password
+  tags: ubuntu-mysql
+
+- name: Confirm Mysql root password before installation
+  ansible.builtin.debconf:
+    name: mysql-server
+    question: mysql-server/root_password_again
+    value: "{{ mysql_root_password }}"
+    vtype: password
+  tags: ubuntu-mysql
+  
+- name: Install MySQL Server
+  ansible.builtin.apt:
+    name: "mysql-server-{{ mysql_version }}"
+    state: present
+  tags: ubuntu-mysql
+  notify:
+    - Start MySQL

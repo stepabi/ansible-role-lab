@@ -1,0 +1,44 @@
+---
+- name: Update yum cache
+  ansible.builtin.yum:
+    update_cache: yes
+  tags: redhat-mysql
+
+- name: Install dependencies
+  ansible.builtin.yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - wget
+    - gnupg
+    - redhat-lsb
+    - curl
+  tags: redhat-mysql
+
+- name: Add MySQL GPG Key
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://repo.mysql.com/RPM-GPG-KEY-mysql-2022
+  tags: redhat-mysql
+
+- name: Import Mysql repository
+  ansible.builtin.yum_repository:
+    name: mysql
+    description: MySQL Repository
+    baseurl: "{{ mysql_repo_baseurl }}"
+    gpgcheck: yes
+    enabled: yes
+  tags: redhat-mysql
+
+- name: Update yum cache after adding MySQL repo
+  ansible.builtin.yum:
+    update_cache: yes
+  tags: redhat-mysql
+
+- name: Install MySQL Server
+  ansible.builtin.yum:
+    name: "mysql-community-server"
+    state: present
+  tags: redhat-mysql
+  notify:
+    - Start MySQL

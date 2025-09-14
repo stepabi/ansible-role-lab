@@ -1,2 +1,13 @@
 ---
 # handlers file for ansible-role-mysql
+- name: Restart MySQL
+  ansible.builtin.service:
+    name: mysql
+    state: restarted
+  tags: always
+
+- name: Start MySQL
+  ansible.builtin.service:
+    name: mysql
+    state: started
+  tags: always

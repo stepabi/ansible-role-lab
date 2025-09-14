@@ -1,0 +1,42 @@
+---
+- name: Remove anonymous users
+  ansible.builtin.mysql_user:
+    name: ''
+    host: '%'
+    state: absent
+  tags: mysql-secure
+
+- name: Disallow root login remotely
+  ansible.builtin.mysql_user:
+    name: root
+    host: '%'
+    state: absent
+  tags: mysql-secure
+
+- name: Remove test database
+  ansible.builtin.mysql_db:
+    name: test
+    state: absent
+  tags: mysql-secure
+
+- name: Reload privilege tables
+  ansible.builtin.command: mysql -e "FLUSH PRIVILEGES;"
+  tags: mysql-secure
+
+- name: Deploy custom my.cnf
+  ansible.builtin.template:
+    src: my.cnf.j2
+    dest: "{{ mysql_mycnf_path }}"
+    owner: mysql
+    group: mysql
+    mode: '0644'
+  notify:
+    - Restart MySQL
+  tags: mysql-secure
+
+- name: Ensure MySQL is started and enabled
+  ansible.builtin.service:
+    name: "{{ mysql_service_name }}"
+    state: started
+    enabled: yes
+  tags: mysql-secure
