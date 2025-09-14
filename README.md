@@ -27,6 +27,13 @@ Including an example of how to use your role (for instance, with variables passe
       roles:
          - { role: username.rolename, x: 42 }
 
+Install Molecule 
+-------------------
+pip install molecule molecule-plugins[docker] ansible
+molecule init scenario default -d docker
+
+
+
 License
 -------
 
@@ -42,7 +49,7 @@ Install Mysql Analysis
 
 1.) Gather Fact about the server.
   1a.) Check the OS version on the gather fact and use the conditional for installation
-2.) Update OS based oncondition
+2.) Update OS based on condition
 3.) Install MYsql 
 4.) Edit my.cnf
 5.) Setup a Start service 
