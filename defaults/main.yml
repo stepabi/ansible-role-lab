@@ -1,6 +1,10 @@
----
 # defaults file for ansible-role-mysql
+mysql_version: "8.0"
 mysql_service_name: "{{ 'mysql' if ansible_facts['os_family'] == 'Debian' else 'mysqld' }}"
 mysql_mycnf_path: "{{ '/etc/mysql/my.cnf' if ansible_facts['os_family'] == 'Debian' else '/etc/my.cnf' }}"
-mysql_version: "8.0"
-mysql_repo_baseurl: "https://repo.mysql.com/yum/mysql-{{ mysql_version }}/community/el/{{ ansible_facts['distribution_major_version'] }}/$basearch/"
+mysql_yum_series: "mysql-{{ mysql_version }}-community"
+mysql_repo_baseurl: "https://repo.mysql.com/yum/{{ mysql_yum_series }}/el/{{ ansible_facts['distribution_major_version'] }}/$basearch/"
+# mysql_python_packages_debian:
+# 	- python3-pymysql
+# mysql_python_packages_redhat:
+# 	- python3-PyMySQL

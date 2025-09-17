@@ -1,0 +1,52 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  become: true
+
+  pre_tasks:
+    - name: Ensure /tmp has correct sticky perms
+      ansible.builtin.file:
+        path: /tmp
+        state: directory
+        mode: "1777"
+
+    # If /tmp/.ansible accidentally exists as a file, remove it first.
+    - name: Remove /tmp/.ansible if it is a file
+      ansible.builtin.file:
+        path: /tmp/.ansible
+        state: absent
+      when: ansible_facts is not defined  # just to avoid relying on facts
+      failed_when: (result is failed) and ('No such file or directory' not in result.msg)
+      register: result
+
+    - name: Ensure Ansible remote temp chain exists
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+      loop:
+        - /tmp/.ansible
+        - /tmp/.ansible/tmp
+
+    - name: Gather facts now that tmp exists
+      ansible.builtin.setup:
+
+  tasks:
+    - name: Ensure Python is present (some minimal images lack it)
+      ansible.builtin.package:
+        name: python3
+        state: present
+      when: ansible_facts['pkg_mgr'] in ['apt','dnf','yum']
+
+    - name: Update package cache (apt)
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_facts['pkg_mgr'] == 'apt'
+
+    - name: Update package cache (dnf/yum)
+      ansible.builtin.yum:
+        update_cache: true
+      when: ansible_facts['pkg_mgr'] in ['dnf','yum']

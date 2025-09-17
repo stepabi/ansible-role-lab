@@ -1,7 +1,7 @@
 ---
 - name: Update apt cache
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
   tags: ubuntu-mysql
 
 - name: Install dependencies
@@ -17,6 +17,7 @@
     - software-properties-common
     - curl
     - dirmngr
+    - python3-pymysql
   tags: ubuntu-mysql
 
 - name: Add MySQL GPG Key
@@ -27,7 +28,9 @@
 
 - name: Import Mysql repository
   ansible.builtin.apt_repository:
-    repo: "deb http://repo.mysql.com/apt/{{ ansible_facts['distribution'] | lower }} {{ ansible_facts['distribution_release'] | lower }} mysql-{{ mysql_version }}"
+    repo: >
+      deb http://repo.mysql.com/apt/{{ ansible_facts['distribution'] | lower }}
+      {{ ansible_facts['distribution_release'] | lower }} mysql-{{ mysql_version }}
     state: present
     filename: mysql.list
   tags: ubuntu-mysql
@@ -55,7 +58,7 @@
   
 - name: Install MySQL Server
   ansible.builtin.apt:
-    name: "mysql-server-{{ mysql_version }}"
+    name: mysql-server
     state: present
   tags: ubuntu-mysql
   notify:

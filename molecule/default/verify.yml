@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Wait for MySQL to respond
+      command: mysqladmin ping
+      register: ping
+      retries: 15
+      delay: 4
+      until: ping.rc == 0 and 'mysqld is alive' in ping.stdout
+      changed_when: false
+
+    - name: Run mysql --version
+      command: mysql --version
+      register: mysql_version_output
+      changed_when: false
+
+    - name: Assert mysql version contains expected major
+      assert:
+        that:
+          - "mysql_version_output.stdout is search(mysql_version)"
+        fail_msg: "MySQL version does not match expected {{ mysql_version }}"
+
+    - name: Verify root cannot login without password (expect failure)
+      command: mysql -u root -e 'SHOW DATABASES;' 
+      register: root_no_pass
+      failed_when: root_no_pass.rc == 0
+      changed_when: false

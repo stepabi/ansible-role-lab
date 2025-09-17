@@ -2,9 +2,5 @@
 - name: Converge
   hosts: all
   gather_facts: true
-  vars:
-    ansible_become: true
-    ansible_become_method: su
-    ansible_become_user: root
   roles:
     - role: role_under_test

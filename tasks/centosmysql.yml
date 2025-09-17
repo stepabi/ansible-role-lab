@@ -13,6 +13,7 @@
     - gnupg
     - redhat-lsb
     - curl
+    - python3-PyMySQL
   tags: redhat-mysql
 
 - name: Add MySQL GPG Key

@@ -1,14 +1,45 @@
----
+# molecule/default/molecule.yml  (only the relevant parts shown)
 driver:
   name: docker
+
 platforms:
   - name: ubuntu
     image: geerlingguy/docker-ubuntu2204-ansible
-    pre_build_image: true
     privileged: true
+    user: root
+    command: /bin/bash -lc 'mkdir -p /tmp/.ansible/tmp && exec /lib/systemd/systemd'
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro,z
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+
   - name: rocky
     image: geerlingguy/docker-rockylinux9-ansible
-    pre_build_image: true
     privileged: true
-dependency:
-  name: galaxy
+    user: root
+    command: /bin/bash -lc 'mkdir -p /tmp/.ansible/tmp && exec /usr/lib/systemd/systemd'
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro,z
+    tmpfs:
+      - /run
+      - /run/lock
+      - /tmp
+
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: prepare.yml
+    converge: converge.yml
+  config_options:
+    defaults:
+      remote_tmp: /tmp/.ansible/tmp
+  inventory:
+    host_vars:
+      ubuntu:
+        ansible_connection: docker
+        ansible_user: root
+      rocky:
+        ansible_connection: docker
+        ansible_user: root
